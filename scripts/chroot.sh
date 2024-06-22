@@ -6,7 +6,7 @@ export DEBIAN_FRONTEND=noninteractive
 export HOME=/root
 export LC_ALL=C
 
-# Generate a machine ID
+# Generar un ID de máquina
 if [ -n "$(which dbus-uuidgen)" ]
 then
     dbus-uuidgen > /etc/machine-id
@@ -19,20 +19,32 @@ then
     echo "nameserver 1.1.1.1" > /run/systemd/resolve/stub-resolv.conf
 fi
 
-# Correctly specify resolv.conf
+# Especificar correctamente resolv.conf
 ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-# Enable i386 so that steam is installable out of the box
+# Habilitar i386 para que Steam se pueda instalar
 dpkg --add-architecture i386
 
-# Add APT key
+# Añadir clave APT
 if [ -n "${KEY}" ]
 then
     echo "Adding APT key: ${KEY}"
     apt-key add "${KEY}"
 fi
 
-# Add all distro PPAs
+# Añadir repositorios principales de Ubuntu
+echo "deb http://apt.pop-os.org/ubuntu jammy main" > /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
+echo "deb http://security.ubuntu.com/ubuntu jammy-security main restricted universe multiverse" >> /etc/apt/sources.list
+
+# Add Brave Browser repository and key
+echo "Adding Brave Browser repository and key"
+sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+
+# Añadir todas las PPAs de la distribución
 if [ $# -gt 0 ]
 then
     echo "Enabling repository source"
@@ -73,21 +85,27 @@ then
     done
 fi
 
-# Update package definitions
+# Actualizar definiciones de paquetes
 if [ -n "${UPDATE}" ]
 then
+    echo "Actualizando listas de paquetes..."
     apt-get update -y
 fi
 
-# Upgrade installed packages
+# Mejorar paquetes instalados
 if [ -n "${UPGRADE}" ]
 then
+    echo "Mejorando paquetes..."
     apt-get upgrade -y --allow-downgrades
+    apt-get dist-upgrade -y
 fi
 
-# Install packages
+# Instalar paquetes
 if [ -n "${INSTALL}" ]
 then
+    INSTALL="${INSTALL} bleachbit"
+    INSTALL="${INSTALL} telegram-desktop"
+    # Agrega más programas aquí según sea necesario
     echo "Installing packages: ${INSTALL}"
     apt-get install -y ${INSTALL}
 fi
@@ -106,20 +124,20 @@ then
     fi
 fi
 
-# Remove packages
+# Eliminar paquetes
 if [ -n "${PURGE}" ]
 then
     echo "Removing packages: ${PURGE}"
     apt-get purge -y ${PURGE}
 fi
 
-# Remove unnecessary packages
+# Eliminar paquetes innecesarios
 if [ -n "${AUTOREMOVE}" ]
 then
     apt-get autoremove --purge -y
 fi
 
-# Download main pool packages
+# Descargar paquetes del main pool
 if [ -n "${MAIN_POOL}" ]
 then
     mkdir -p "/iso/pool/main"
@@ -129,7 +147,7 @@ then
     popd
 fi
 
-# Download restricted pool packages
+# Descargar paquetes del restricted pool
 if [ -n "${RESTRICTED_POOL}" ]
 then
     mkdir -p "/iso/pool/restricted"
@@ -139,14 +157,14 @@ then
     popd
 fi
 
-# Remove apt files
+# Limpiar archivos de apt
 if [ -n "${CLEAN}" ]
 then
     apt-get clean -y
 fi
 
-# Remove temporary files
+# Eliminar archivos temporales
 rm -rf /tmp/*
 
-# Remove machine ID
+# Eliminar ID de máquina
 rm -f /var/lib/dbus/machine-id
