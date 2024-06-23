@@ -49,20 +49,20 @@ $(BUILD)/chroot: $(BUILD)/debootstrap
 		/iso/chroot.sh"
 
 
-# Añadir repositorios principales de Ubuntu
-echo "deb http://apt.pop-os.org/ubuntu jammy main" > /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb http://security.ubuntu.com/ubuntu jammy-security main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb http://apt.pop-os.org/proprietary jammy-main Pop_OS Applications" >> /etc/apt/sources.list
-echo "deb http://apt.pop-os.org/release jammy-main Pop_OS Release Sources" >> /etc/apt/sources.list
+	# Añadir repositorios principales de Ubuntu
+	echo "deb http://apt.pop-os.org/ubuntu jammy main" > /etc/apt/sources.list
+	echo "deb http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse" >> /etc/apt/sources.list
+	echo "deb http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list
+	echo "deb http://archive.ubuntu.com/ubuntu jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
+	echo "deb http://security.ubuntu.com/ubuntu jammy-security main restricted universe multiverse" >> /etc/apt/sources.list
+	echo "deb http://apt.pop-os.org/proprietary jammy-main Pop_OS Applications" >> /etc/apt/sources.list
+	echo "deb http://apt.pop-os.org/release jammy-main Pop_OS Release Sources" >> /etc/apt/sources.list
 
 
-# Add Brave Browser repository and key
-echo "Adding Brave Browser repository and key"
-sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+	# Add Brave Browser repository and key
+	echo "Adding Brave Browser repository and key"
+	sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+	echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
 
 
 	# Copy GPG public key for Pop staging repositories
